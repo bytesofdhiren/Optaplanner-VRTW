@@ -8,6 +8,7 @@ public class PlanningProblem implements Serializable{
 	
 	private int id;
 	private String distanceType;
+	private String customerType;
 	private List<Location> locationList;
 	private List<Depot> depotList;
 	private List<Vehicle> vehicleList;
@@ -49,6 +50,13 @@ public class PlanningProblem implements Serializable{
 	public void setVehicleList(List<Vehicle> vehicleList) {
 		this.vehicleList = vehicleList;
 	}
+	public String getCustomerType() {
+		return customerType;
+	}
+	public void setCustomerType(String customerType) {
+		this.customerType = customerType;
+	}
 
+	
 	
 }

@@ -1,43 +1,72 @@
 package com.optaplanner.rest;
 
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-
+import java.util.concurrent.ExecutionException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.optaplanner.dto.Employee;
-import com.optaplanner.dto.Greeting;
 import com.optaplanner.dto.PlanningProblem;
 import com.optaplanner.dto.ProblemSolution;
 
 @RestController
 public class Services {
 
-    private static final String template = "Hello, %s!";
-    private final AtomicLong counter = new AtomicLong();
-    Map<Integer, Employee> empData = new HashMap<Integer, Employee>();
-    
-    @RequestMapping("/greeting")
-    public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
-        return new Greeting(counter.incrementAndGet(),
-                            String.format(template, name));
-    }
-    
-    @RequestMapping(value = "/startSolving", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ProblemSolution> startSolving(@RequestBody PlanningProblem problem) {		
-		ProblemSolution solution = new ProblemSolution();
-		solution.setId(10);
-		solution.setStatus("Processing");
-		return new ResponseEntity<>(solution, HttpStatus.OK);
+	// Map holds the optaplanner objects between the requests
+	private final HashMap<String, Object> map = new HashMap<>();
+
+	@RequestMapping(value = "/startSolving", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ProblemSolution> startSolving(@RequestBody PlanningProblem problem)
+			throws InterruptedException, ExecutionException {
+		Optaplanner planner = new Optaplanner();
+
+		// This key is used as a reference to optaplanner process
+		final String key = RandomStringUtils.randomAlphanumeric(30);
+		map.put(key, planner);
+
+		// Start solving the problem
+		ProblemSolution problemSolution = planner.OptimizeData(problem, key);
+
+		return new ResponseEntity<>(problemSolution, HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "/getSolution/{key}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ProblemSolution> getSolution(@PathVariable(value = "key") String key) {
+		if (map.containsKey(key)) {
+			// Get the optaplanner object based on key & remove the object from
+			// memory
+			Optaplanner hw = (Optaplanner) map.get(key);
+			
+			//If process is going on or terminated by another call, it will not remove the key
+			if (hw.status != "Processing" && hw.status != "Cacelled") {
+				map.remove(key);
+			}
+			if (hw != null) {
+				// Return the best solution
+				ProblemSolution solution = hw.GetBestSolution(key);
+				return new ResponseEntity<>(solution, HttpStatus.OK);
+			}
+		}
+		return new ResponseEntity<>(null, HttpStatus.EXPECTATION_FAILED);
+	}
+
+	@RequestMapping(value = "/terminateSolver/{key}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ProblemSolution> terminateSolver(@PathVariable(value = "key") String key) {
+		if (map.containsKey(key)) {
+			Optaplanner hw = (Optaplanner) map.get(key);
+			map.remove(key);
+			if (hw != null) {
+
+				return new ResponseEntity<>(hw.terminateSolver(key), HttpStatus.OK);
+			}
+		}
+		return new ResponseEntity<>(null, HttpStatus.EXPECTATION_FAILED);
+	}
+
 }
