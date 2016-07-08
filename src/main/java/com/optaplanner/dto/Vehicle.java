@@ -7,6 +7,16 @@ public class Vehicle {
 	private long readyTime;
 	private long dueTime;
 	private String visitSequence;
+	private String visitArrivalTimeSequence;
+
+	
+	public String getVisitArrivalTimeSequence() {
+		return visitArrivalTimeSequence;
+	}
+
+	public void setVisitArrivalTimeSequence(String visitArrivalTimeSequence) {
+		this.visitArrivalTimeSequence = visitArrivalTimeSequence;
+	}
 
 	public long getReadyTime() {
 		return readyTime;

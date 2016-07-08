@@ -55,6 +55,9 @@ public class Optaplanner {
 		if(status != "Processing" && status != "Cacelled"){
 			problemSolution = GenerateBestSolution(bestSolution, key);
 		}
+		else if(status == "Processing"){
+			problemSolution = GenerateBestSolution(solver.getBestHelloSolution(), key);
+		}
 		else{
 			problemSolution = new ProblemSolution(key, status);
 		}
@@ -62,12 +65,13 @@ public class Optaplanner {
 	}
 	
 	//Terminate solution
-	public ProblemSolution terminateSolver(String key){		
+	public ProblemSolution terminateSolver(String key){			
 		if (future != null && !future.isDone()) {
             future.cancel(true);
             if (future.isCancelled()) {
                 solver.cancel();                
                 status = "Cancelled";
+                return GenerateBestSolution(solver.getBestHelloSolution(), key);
             }            
         } 				
 		return new ProblemSolution(key, status);
@@ -81,7 +85,7 @@ public class Optaplanner {
 		future = pool.submit(solver);
 		
 		//This will get response from Call method
-		bestSolution = future.get();	
+		bestSolution = future.get();			
 		
 		status = "Completed";
 	}
@@ -96,6 +100,7 @@ public class Optaplanner {
 				
 		for(int counter = 0; counter < bestHelloSolution.getVehicleList().size(); counter ++){
 			StringBuilder visitSequence = new StringBuilder();
+			StringBuilder visitArrivalTimeSequence = new StringBuilder();
 
 			//Optaplanner Solution Vehicle
 			Vehicle vehicle = bestHelloSolution.getVehicleList().get(counter);
@@ -109,10 +114,14 @@ public class Optaplanner {
 			Customer nextCustomer = vehicle.getNextCustomer();
 			while(nextCustomer != null){
 				visitSequence.append("," + nextCustomer.getId());
+				if(nextCustomer.getClass() == TimeWindowedCustomer.class){
+					visitArrivalTimeSequence.append("," + ((TimeWindowedCustomer)nextCustomer).getArrivalTime());
+				}
 				nextCustomer = nextCustomer.getNextCustomer();
 			}	
 			
 			outVehicle.setVisitSequence(visitSequence.toString());
+			outVehicle.setVisitArrivalTimeSequence(visitArrivalTimeSequence.toString());
 			outVehicleList.add(outVehicle);
 		}
 		

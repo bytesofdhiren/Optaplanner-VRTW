@@ -18,8 +18,8 @@
   </scoreDirectorFactory>
 
   <termination>
-    <!--minutesSpentLimit>1</minutesSpentLimit-->
-    <secondsSpentLimit>10</secondsSpentLimit>
+    <minutesSpentLimit>5</minutesSpentLimit>
+    <!--secondsSpentLimit>20</secondsSpentLimit-->
   </termination>
   <constructionHeuristic>
     <constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType>

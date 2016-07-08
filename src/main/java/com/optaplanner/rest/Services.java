@@ -44,12 +44,13 @@ public class Services {
 			Optaplanner hw = (Optaplanner) map.get(key);
 			
 			//If process is going on or terminated by another call, it will not remove the key
-			if (hw.status != "Processing" && hw.status != "Cacelled") {
-				map.remove(key);
-			}
+			
 			if (hw != null) {
 				// Return the best solution
 				ProblemSolution solution = hw.GetBestSolution(key);
+				if (hw.status != "Processing" && hw.status != "Cacelled") {
+					map.remove(key);
+				}
 				return new ResponseEntity<>(solution, HttpStatus.OK);
 			}
 		}
