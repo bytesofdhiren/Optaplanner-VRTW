@@ -6,10 +6,16 @@ import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 import org.optaplanner.core.api.solver.event.BestSolutionChangedEvent;
 import org.optaplanner.core.api.solver.event.SolverEventListener;
+import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.optaplanner.examples.vehiclerouting.domain.VehicleRoutingSolution;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.optaplanner.dto.Configuration;
+
 import org.optaplanner.core.api.domain.solution.Solution;
 
 public class ProblemSolver implements Callable {
+	
 	
 	Solver<VehicleRoutingSolution> solver; 	
 	VehicleRoutingSolution solution;
@@ -38,6 +44,11 @@ public class ProblemSolver implements Callable {
 	@Override
 	public Object call() throws Exception { 
 		SolverFactory<VehicleRoutingSolution> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/vehiclerouting/solver/vehicleRoutingSolverConfig.xml");
+		
+		TerminationConfig tConfig = new TerminationConfig();
+		tConfig.setSecondsSpentLimit(Configuration.terminationSecondsSpentLimit);		
+		solverFactory.getSolverConfig().setTerminationConfig(tConfig);
+		
 		solver = solverFactory.buildSolver();
 		RegisterForIntermediateSolution();
 		solver.solve(solution);
