@@ -199,7 +199,7 @@ public class Optaplanner {
 					break;
 				}
 			}
-			customer.setDemand(((com.optaplanner.dto.Customer)problem.getCustomerList().get(i)).getDemant());
+			customer.setDemand(((com.optaplanner.dto.Customer)problem.getCustomerList().get(i)).getDemand());
 			if(problem.getCustomerType().equals("timewindowed")){
 				TimeWindowedCustomer timeWindowedCustomer = (TimeWindowedCustomer) customer;
                 timeWindowedCustomer.setReadyTime(((com.optaplanner.dto.Customer)problem.getCustomerList().get(i)).getReadyTime());

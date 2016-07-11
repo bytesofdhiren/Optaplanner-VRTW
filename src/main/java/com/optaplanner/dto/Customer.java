@@ -20,12 +20,6 @@ public class Customer {
 	public void setLocationId(int locationId) {
 		this.locationId = locationId;
 	}
-	public int getDemant() {
-		return demand;
-	}
-	public void setDemant(int demant) {
-		this.demand = demand;
-	}
 	public int getDemand() {
 		return demand;
 	}

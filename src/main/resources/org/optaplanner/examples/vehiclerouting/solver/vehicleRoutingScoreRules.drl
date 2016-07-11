@@ -82,7 +82,7 @@ end
 //Score constraint arrivalAfterDueTimeAtDepot is a build-in hard constraint in VehicleRoutingImporter
 
 
-
+/*
 rule "depotDueTimeWindow"
     when        
         $customer : TimeWindowedCustomer($id : id, previousStandstill != null, $vehicle : vehicle, $customerDeparture : getDepartureTime(), 
@@ -94,6 +94,7 @@ rule "depotDueTimeWindow"
         //System.out.println("Distance from " + $distance);
         scoreHolder.addHardConstraintMatch(kcontext, - ($distance + $customerDeparture - ((TimeWindowedDepot)$vehicle.getDepot()).getDueTime()));
 end
+*/
 
 
 
