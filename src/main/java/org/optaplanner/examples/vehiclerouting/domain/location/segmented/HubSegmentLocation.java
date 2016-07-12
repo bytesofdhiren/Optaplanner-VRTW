@@ -65,7 +65,7 @@ public class HubSegmentLocation extends Location {
             distance = hubTravelDistanceMap.get((HubSegmentLocation) location);
         }
         // Multiplied by 1000 to avoid floating point arithmetic rounding errors
-        return (long) (distance * 1000.0 + 0.5);
+        return (long)distance ;
     }
 
     public double getDistanceDouble(RoadSegmentLocation location) {

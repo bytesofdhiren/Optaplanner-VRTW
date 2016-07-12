@@ -62,7 +62,7 @@ public class RoadSegmentLocation extends Location {
     public long getDistanceTo(Location location) {
         Double distance = getDistanceDouble((RoadSegmentLocation) location);
         // Multiplied by 1000 to avoid floating point arithmetic rounding errors
-        return (long) (distance * 1000.0 + 0.5);
+        return distance.longValue();
     }
 
     public Double getDistanceDouble(RoadSegmentLocation location) {

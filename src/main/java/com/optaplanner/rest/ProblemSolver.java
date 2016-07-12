@@ -15,13 +15,12 @@ import com.optaplanner.dto.Configuration;
 import org.optaplanner.core.api.domain.solution.Solution;
 
 public class ProblemSolver implements Callable {
-	
-	
-	Solver<VehicleRoutingSolution> solver; 	
+
+	Solver<VehicleRoutingSolution> solver;
 	VehicleRoutingSolution solution;
-	
-	private VehicleRoutingSolution bestHelloSolution;	
-	
+
+	private VehicleRoutingSolution bestHelloSolution;
+
 	public VehicleRoutingSolution getBestHelloSolution() {
 		return bestHelloSolution;
 	}
@@ -30,45 +29,48 @@ public class ProblemSolver implements Callable {
 		this.bestHelloSolution = bestHelloSolution;
 	}
 
-	public ProblemSolver(VehicleRoutingSolution solution){
+	public ProblemSolver(VehicleRoutingSolution solution) {
 		this.solution = solution;
 	}
-	
+
 	public boolean cancel() {
-        if (solver != null && !solver.isTerminateEarly() && solver.isSolving()) {
-            return solver.terminateEarly();
-        }
-        return false;
-    }
-	
+		if (solver != null && !solver.isTerminateEarly() && solver.isSolving()) {
+			return solver.terminateEarly();
+		}
+		return false;
+	}
+
 	@Override
-	public Object call() throws Exception { 
-		SolverFactory<VehicleRoutingSolution> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/vehiclerouting/solver/vehicleRoutingSolverConfig.xml");
-		
-		TerminationConfig tConfig = new TerminationConfig();
-		tConfig.setSecondsSpentLimit(Configuration.terminationSecondsSpentLimit);		
-		solverFactory.getSolverConfig().setTerminationConfig(tConfig);
-		
+	public Object call() throws Exception {
+		SolverFactory<VehicleRoutingSolution> solverFactory = SolverFactory
+				.createFromXmlResource("org/optaplanner/examples/vehiclerouting/solver/vehicleRoutingSolverConfig.xml");
+
+		if (Configuration.terminationSecondsSpentLimit != null) {
+			TerminationConfig tConfig = new TerminationConfig();
+			tConfig.setSecondsSpentLimit(Configuration.terminationSecondsSpentLimit);
+			solverFactory.getSolverConfig().setTerminationConfig(tConfig);
+		}
+
 		solver = solverFactory.buildSolver();
 		RegisterForIntermediateSolution();
 		solver.solve(solution);
-		bestHelloSolution = (VehicleRoutingSolution) solver.getBestSolution();		
+		bestHelloSolution = (VehicleRoutingSolution) solver.getBestSolution();
 		return bestHelloSolution;
 	}
-	
-	private void RegisterForIntermediateSolution(){		
+
+	private void RegisterForIntermediateSolution() {
 		solver.addEventListener(new SolverEventListener<VehicleRoutingSolution>() {
 
 			@Override
 			public void bestSolutionChanged(BestSolutionChangedEvent<VehicleRoutingSolution> event) {
 				if (solver.isEveryProblemFactChangeProcessed()) {
-                    // final is also needed for thread visibility
+					// final is also needed for thread visibility
 					bestHelloSolution = event.getNewBestSolution();
-                    // Migrate it to the event thread                    
-                }				
+					// Migrate it to the event thread
+				}
 			}
-			
-		});		
+
+		});
 	}
 
 }
